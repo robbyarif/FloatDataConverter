@@ -16,11 +16,11 @@ namespace FloatDataConverter
         static void Main(string[] args)
         {
             // Init default parameters
-            string inputFilePath = @"C:\Users\robby\Documents\Visual Studio 2013\Projects\FloatDataConverter\FloatDataConverter\input.dat";
-            string outputTxtPath = @"C:\Users\robby\Documents\Visual Studio 2013\Projects\FloatDataConverter\FloatDataConverter\output.txt";
-            string outputCsvPath = @"C:\Users\robby\Documents\Visual Studio 2013\Projects\FloatDataConverter\FloatDataConverter\output.csv";
-            string outputCropTxtPath = @"C:\Users\robby\Documents\Visual Studio 2013\Projects\FloatDataConverter\FloatDataConverter\output_cropped.txt";
-            string outputCropCsvPath = @"C:\Users\robby\Documents\Visual Studio 2013\Projects\FloatDataConverter\FloatDataConverter\output_cropped.csv";
+            string inputFilePath = @"input.dat";
+            string outputTxtPath = @"output.txt";
+            string outputCsvPath = @"output.csv";
+            string outputCropTxtPath = @"output_cropped.txt";
+            string outputCropCsvPath = @"output_cropped.csv";
             int numDataRow = 480;
             int numDataColumn = 1440;
             double gridSize = 0.25;
@@ -40,15 +40,35 @@ namespace FloatDataConverter
             Console.WriteLine("Program akan mengkonversi file {0} menjadi dua file: {1} dan {2}", inputFilePath, outputCsvPath, outputCropCsvPath);
             Console.WriteLine("Saat ini input data diasumsikan");
             Console.WriteLine("- Ukuran Grid: {0} (horizontal) x {1} (vertikal)", numDataColumn, numDataRow);
-            Console.WriteLine("- Resolusi Grid: {0}", gridSize);
+            Console.WriteLine("- Grid Size: {0}", gridSize);
             Console.WriteLine("- Data dipetakan dari kiri - kanan lalu atas - bawah.");
             Console.WriteLine("- Data pertama pada koordinat {0}, {1}.", firstDataLat.ToLatString(), firstDataLon.ToLonString());
-            Console.WriteLine("- Koordinat Crop Data (Indonesia): 2.5°S - 5°S, 102°E - 106°E",
+            Console.WriteLine("- Koordinat Crop Data (Indonesia): {0} - {1}, {2} - {3}",
                 croptopLatDeg.ToLatString(), cropbottomLatDeg.ToLatString(), cropleftLongDeg.ToLonString(), croprightLongDeg.ToLonString());
-            Console.WriteLine(" Tekan enter untuk melanjutkan.");
-            Console.ReadKey();
 
             // TODO: create input method
+            string input;
+            Console.WriteLine(" Gunakan default value? (Y/N)");
+            input = Console.ReadLine();
+            if (input.Equals("n", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.Write("File input: "); inputFilePath = Console.ReadLine();
+                Console.Write("File output: "); outputCsvPath = Console.ReadLine();
+                Console.Write("File cropped output: "); outputCropCsvPath= Console.ReadLine();
+                Console.Write("Ukuran Grid Horizontal: "); numDataColumn = Convert.ToInt32(Console.ReadLine());
+                Console.Write("Ukuran Grid Vertikal: "); numDataRow = Convert.ToInt32(Console.ReadLine());
+                Console.Write("Grid Size: "); gridSize = Convert.ToDouble(Console.ReadLine());
+                Console.WriteLine("Gunakan aturan di bawah untuk pengisian Latitude dan Longitude");
+                Console.WriteLine("Lat: > 0 untuk North/Utara, < 0 untuk South/Selatan");
+                Console.WriteLine("Lon: < 0 untuk East/Bujur Timur, > 0 untuk West/Bujur Barat");
+                Console.Write("Data pertama terletak pada Lat: "); firstDataLat = Convert.ToDouble(Console.ReadLine());
+                Console.Write("Data pertama terletak pada Lon: "); firstDataLon = Convert.ToDouble(Console.ReadLine());
+                Console.Write("Top Crop Lat: "); croptopLatDeg = Convert.ToDouble(Console.ReadLine());
+                Console.Write("Bottom Crop Lat: "); cropbottomLatDeg = Convert.ToDouble(Console.ReadLine());
+                Console.Write("Left Crop Lon: "); cropleftLongDeg = Convert.ToDouble(Console.ReadLine());
+                Console.Write("Right Crop Lon: "); croprightLongDeg = Convert.ToDouble(Console.ReadLine());
+            }
+
             try
             {
                 // Map input data and export to CSV

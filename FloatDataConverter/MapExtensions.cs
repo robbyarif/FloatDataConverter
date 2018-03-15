@@ -10,11 +10,11 @@ namespace FloatDataConverter
     {
         public static string ToLatString(this double lat)
         {
-            return lat >= 0 ? string.Format("{0}°N", lat) : string.Format("{0}°S", lat);
+            return lat >= 0 ? string.Format("{0}°N", lat) : string.Format("{0}°S", Math.Abs(lat));
         }
         public static string ToLonString(this double lon)
         {
-            return lon >= 0 ? string.Format("{0}°W", lon) : string.Format("{0}°E", lon);
+            return lon >= 0 ? string.Format("{0}°W", lon) : string.Format("{0}°E", Math.Abs(lon));
         }
 
         /// <summary>
