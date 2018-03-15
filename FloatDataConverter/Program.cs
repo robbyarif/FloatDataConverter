@@ -72,17 +72,21 @@ namespace FloatDataConverter
             try
             {
                 // Map input data and export to CSV
+                Console.WriteLine("Importing file {0}...", inputFilePath);
                 var map = new Map(numDataRow, numDataColumn, gridSize, firstDataLat, firstDataLon.InterpolateLon());
+                Console.WriteLine("Export initial data to file {0}...", outputCsvPath);
                 map.ImportData(inputFilePath);
                 map.SaveToFile(outputTxtPath, map.PrintData());
                 map.SaveToFile(outputCsvPath, map.PrintDataCsvFormat());
 
                 // Crop Map and export to CSV
+                Console.WriteLine("Cropping spatial data...");
                 var newMap = map.CropMap(croptopLatDeg, cropbottomLatDeg, cropleftLongDeg.InterpolateLon(), croprightLongDeg.InterpolateLon());
+                Console.WriteLine("Export cropped data to file {0}...", outputCropCsvPath);
                 map.SaveToFile(outputCropTxtPath, newMap.PrintData());
                 map.SaveToFile(outputCropCsvPath, newMap.PrintDataCsvFormat());
 
-                Console.WriteLine("Berhasil mengkonversi data. Cek file output.txt dan output_cropped.txt");
+                Console.WriteLine("Berhasil mengkonversi data. Cek file {0} dan {1}...", outputCsvPath, outputCropCsvPath);
                 Console.ReadKey();
             }
             catch (ArgumentException ex)
