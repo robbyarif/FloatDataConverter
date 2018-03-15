@@ -14,27 +14,26 @@ namespace FloatDataConverter
         public int numColumn;
         public double gridSize;
 
-        public double firstDataLat;
-        public double firstDataLon;
+        public double firstTopDataLat;
+        public double firstLeftDataLon;
 
         public double topLatDeg;
         public double bottomLatDeg;
         public double rightLongDeg;
         public double leftLongDeg;
 
-        public Map(int numRow, int numColumn, double gridSize, double firstDataLat, double firstDataLon,
-            double topLatDeg, double bottomLatDeg, double rightLongDeg, double leftLongDeg)
+        public Map(int numRow, int numColumn, double gridSize, double firstTopDataLat, double firstLeftDataLon)
         {
             this.data = new float[numRow, numColumn];
             this.numRow = numRow;
             this.numColumn = numColumn;
             this.gridSize = gridSize;
-            this.firstDataLat = firstDataLat;
-            this.firstDataLon = firstDataLon;
-            this.topLatDeg = topLatDeg;
-            this.bottomLatDeg = bottomLatDeg;
-            this.rightLongDeg = rightLongDeg;
-            this.leftLongDeg = leftLongDeg;
+            this.firstTopDataLat = firstTopDataLat;
+            this.firstLeftDataLon = firstLeftDataLon;
+            this.topLatDeg = firstTopDataLat;
+            this.bottomLatDeg = firstTopDataLat - (numRow * gridSize);
+            this.leftLongDeg = firstLeftDataLon;
+            this.rightLongDeg = firstLeftDataLon + (numColumn * gridSize);
         }
 
         /// <summary>
@@ -75,26 +74,33 @@ namespace FloatDataConverter
         /// </summary>
         /// <param name="croptopLatDeg"></param>
         /// <param name="cropbottomLatDeg"></param>
-        /// <param name="croprightLongDeg"></param>
         /// <param name="cropleftLongDeg"></param>
+        /// <param name="croprightLongDeg"></param>
         /// <returns></returns>
-        public Map CropMap(double croptopLatDeg, double cropbottomLatDeg, double croprightLongDeg, double cropleftLongDeg)
+        public Map CropMap(double croptopLatDeg, double cropbottomLatDeg, double cropleftLongDeg, double croprightLongDeg)
         {
-            var rowOffset = (int)((topLatDeg - croptopLatDeg) / gridSize);
-            var rowCount = (int)((croptopLatDeg - cropbottomLatDeg) / gridSize);
-            var columnOffset = (int)(-1 * (leftLongDeg - cropleftLongDeg) / gridSize);
-            var columnCount = (int)(-1 * (cropleftLongDeg - croprightLongDeg) / gridSize);
+            // Validate crop area
+            if (croptopLatDeg > topLatDeg || cropbottomLatDeg < bottomLatDeg
+                || cropleftLongDeg < leftLongDeg || croprightLongDeg > rightLongDeg)
+            {
+                throw new ArgumentException("Invalid crop parameters. Crop area exceeding available map area.");
+            }
+            else if (croptopLatDeg < cropbottomLatDeg || cropleftLongDeg > croprightLongDeg)
+            {
+                throw new ArgumentException("Invalid crop parameters. Top crop area can't be less than bottom crop area and left crop area can't be more than right crop area");
+            }
 
-
+            var rowOffset = Convert.ToInt32(Math.Round((topLatDeg - croptopLatDeg) / gridSize, 2));
+            var rowCount = Convert.ToInt32(Math.Round((croptopLatDeg - cropbottomLatDeg) / gridSize, 2));
+            var columnOffset = Convert.ToInt32(Math.Round(-1 * (leftLongDeg - cropleftLongDeg) / gridSize, 2));
+            var columnCount = Convert.ToInt32(Math.Round(-1 * (cropleftLongDeg - croprightLongDeg) / gridSize, 2));
 
             var newRow = rowCount;
             var newColumn = columnCount;
             var newGridSize = gridSize;
-            var newTopLatDeg = topLatDeg + (rowOffset * gridSize);
-            var newBottomLatDeg = newTopLatDeg + (rowCount * gridSize);
-            var newLeftLongDeg = leftLongDeg + (columnOffset * gridSize);
-            var newRightLongDeg = newLeftLongDeg + (columnCount * gridSize);
-            var newMap = new Map(newRow, newColumn, newGridSize, newTopLatDeg, newBottomLatDeg, newRightLongDeg, newLeftLongDeg);
+            var newTopDataLat = Math.Round(topLatDeg - (rowOffset * gridSize), 2);
+            var newLeftDataLon = Math.Round(leftLongDeg + (columnOffset * gridSize), 2);
+            var newMap = new Map(newRow, newColumn, newGridSize, newTopDataLat, newLeftDataLon);
 
             for (int i = rowOffset; i < rowOffset + rowCount; i++)
             {
@@ -132,16 +138,17 @@ namespace FloatDataConverter
         {
             var sb = new StringBuilder();
             sb.AppendLine(string.Format("{0}, {1}, {2}", "Data Value", "Latitude", "Longitude"));
-            var currentLat = this.firstDataLat;
-            var currentLon = this.firstDataLon;
+            var currentLat = this.firstTopDataLat;
+            var currentLon = this.firstLeftDataLon.DeInterpolateLon();
             for (int i = 0; i < numRow; i++)
             {
+                currentLon = this.firstLeftDataLon.DeInterpolateLon();
                 for (int j = 0; j < numColumn; j++)
                 {
-                    sb.AppendFormat("{0,15}, {1}, {2}", data[i, j].ToString(), currentLat, currentLon);
-                    currentLon += this.gridSize;
+                    sb.AppendFormat("{0,15}, {1}, {2} \n", data[i, j].ToString(), currentLat, currentLon);
+                    currentLon -= this.gridSize;
                 }
-                currentLat += this.gridSize;
+                currentLat -= this.gridSize;
             }
             return sb.ToString();
         }
