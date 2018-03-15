@@ -17,9 +17,7 @@ namespace FloatDataConverter
         {
             // Init default parameters
             string inputFilePath = @"input.dat";
-            string outputTxtPath = @"output.txt";
             string outputCsvPath = @"output.csv";
-            string outputCropTxtPath = @"output_cropped.txt";
             string outputCropCsvPath = @"output_cropped.csv";
             int numDataRow = 480;
             int numDataColumn = 1440;
