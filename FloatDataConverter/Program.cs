@@ -10,7 +10,7 @@ namespace FloatDataConverter
 {
     class Program
     {
-        private static string path = @"C:\Workspace\FloatData\GSMAP daily data - Copy";
+        private static string path = "";
 
         /// <summary>
         /// Main Program Float Data Converter
@@ -18,6 +18,10 @@ namespace FloatDataConverter
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            // TODO: read from configuration file
+            if (path == "")
+                path = Directory.GetCurrentDirectory();
+
             Console.WriteLine("Data Converter Program. Press enter to continue...");
             Console.ReadKey();
             ExtractFiles(path);

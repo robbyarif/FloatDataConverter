@@ -95,15 +95,12 @@ namespace FloatDataConverter
             var map = new Map(numDataRow, numDataColumn, gridSize, firstDataLat, firstDataLon.InterpolateLon());
             map.ImportData(file.FullName);
 
-            var currentFilePath = file.FullName;
-            var outputFilePath = currentFilePath.Remove(currentFilePath.Length - file.Extension.Length) + "_ori.csv";
-            map.SaveToFile(outputFilePath, map.PrintDataCsvFormat());
-
             // Crop Map and export to CSV
-            outputFilePath = currentFilePath.Remove(currentFilePath.Length - file.Extension.Length) + "_crop.csv";
+            var currentFilePath = file.FullName;
+            var outputFilePath = currentFilePath.Remove(currentFilePath.Length - file.Extension.Length) + "_crop.csv";
             var newMap = map.CropMap(croptopLatDeg, cropbottomLatDeg, cropleftLongDeg.InterpolateLon(), croprightLongDeg.InterpolateLon());
             map.SaveToFile(outputFilePath, newMap.PrintDataCsvFormat());
-            Console.WriteLine("Converted: {0}...", file);
+            Console.WriteLine("Converted: {0}", file);
         }
 
         public static string ToLatString(this double lat)
