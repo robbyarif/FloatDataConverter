@@ -10,8 +10,7 @@ namespace FloatDataConverter
 {
     class Program
     {
-        private static string toExtractPath = @"C:\Workspace\FloatData\to_be_extracted";
-        private static string extractedPath = @"C:\Workspace\FloatData\extracted";
+        private static string path = @"C:\Workspace\FloatData\GSMAP daily data - Copy";
 
         /// <summary>
         /// Main Program Float Data Converter
@@ -19,83 +18,47 @@ namespace FloatDataConverter
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            while (true)
+            Console.WriteLine("Data Converter Program. Press enter to continue...");
+            Console.ReadKey();
+            ExtractFiles(path);
+            ConvertFiles(path);
+            Console.WriteLine("Done. Press enter to continue...");
+            Console.ReadKey();
+        }
+
+        static void ConvertFiles(string path)
+        {
+            // Convert Files
+            DirectoryInfo directorySelected = new DirectoryInfo(path);
+            foreach (FileInfo fileToConvert in directorySelected.GetFiles("*.dat"))
             {
-                // Print welcome message
-                var command = PrintWelcomeMessage();
-
-                // Menu 1. Extract Files to Folder
-                if (command == "1")
-                {
-                    BatchExtract();
-                }
-                // Menu 2. Batch Convert Files
-                else if (command == "2")
-                {
-                    MapExtensions.ConvertData();
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter correct menu number.");
-                }
-
+                Convert(fileToConvert);
             }
         }
 
-        static string PrintWelcomeMessage()
+        private static void Convert(FileInfo fileToConvert)
         {
-            Console.Clear();
-
-            Console.WriteLine("Data Converter Program");
-            Console.WriteLine("===================================");
-            Console.WriteLine("1. Batch Extract .dat.gz Files");
-            Console.WriteLine("2. Batch Convert .dat Files");
-            Console.WriteLine("Pilih menu:");
-            return Console.ReadLine();
+            MapExtensions.ConvertFile(fileToConvert);
         }
 
-        static void BatchExtract()
+        static void ExtractFiles(string path)
         {
-            Console.WriteLine("1. Batch Extract .dat.gz Files");
-            Console.WriteLine("===================================");
-            Console.WriteLine("Instruksi:");
-            Console.WriteLine("1. Siapkan folder bernama {0} yang berisi file-file .dat.gz.", toExtractPath);
-            Console.WriteLine("2. Program akan mengekstrak file-file ke folder {0}.", extractedPath);
-            Console.WriteLine("Tekan enter untuk memulai!"); Console.ReadKey();
-            ExtractFiles();
-        }
-
-        static void ExtractFiles()
-        {
-            // Check input folder exists
-            if (!Directory.Exists(toExtractPath))
-            {
-                throw new DirectoryNotFoundException("");
-            }
-
-            // Delete output folder if exists
-            if (Directory.Exists(extractedPath))
-            {
-                Directory.Delete(extractedPath);
-            }
-            Directory.CreateDirectory(extractedPath);
-
             // Decompress
-            DirectoryInfo directorySelected = new DirectoryInfo(toExtractPath);
+            DirectoryInfo directorySelected = new DirectoryInfo(path);
             foreach (FileInfo fileToDecompress in directorySelected.GetFiles("*.gz"))
             {
-                Decompress(fileToDecompress, new DirectoryInfo(extractedPath));
+                Decompress(fileToDecompress);
             }
         }
 
-        static void Decompress(FileInfo fileToDecompress, DirectoryInfo outputPath)
+        static void Decompress(FileInfo fileToDecompress)
         {
             using (FileStream originalFileStream = fileToDecompress.OpenRead())
             {
-                string currentFileName = fileToDecompress.Name;
+                string currentFileName = fileToDecompress.FullName;
                 string newFileName = currentFileName.Remove(currentFileName.Length - fileToDecompress.Extension.Length);
 
-                using (FileStream decompressedFileStream = File.Create(outputPath.FullName + "\\" + newFileName))
+                using (FileStream decompressedFileStream = File.Create(newFileName))
                 {
                     using (GZipStream decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress))
                     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,26 +9,28 @@ namespace FloatDataConverter
 {
     public static class MapExtensions
     {
+        // Init default parameters
+        private static string inputFilePath = @"input.dat";
+        private static string outputCsvPath = @"output.csv";
+        private static string outputCropCsvPath = @"output_cropped.csv";
+        private static int numDataRow = 480;
+        private static int numDataColumn = 1440;
+        private static double gridSize = 0.25;
+
+        // Initial upper and leftmost data: 59.95°N, 0.05°E
+        private static double firstDataLat = 59.95;
+        private static double firstDataLon = -0.05;
+
+        // South Sumatera area 2.5°S - 5°S and 102°E - 106°E
+        private static double croptopLatDeg = -2.5;
+        private static double cropbottomLatDeg = -5;
+        private static double croprightLongDeg = -106;
+        private static double cropleftLongDeg = -102;
+
+
         public static void ConvertData()
         {
-            // Init default parameters
-            string inputFilePath = @"input.dat";
-            string outputCsvPath = @"output.csv";
-            string outputCropCsvPath = @"output_cropped.csv";
-            int numDataRow = 480;
-            int numDataColumn = 1440;
-            double gridSize = 0.25;
-
-            // Initial upper and leftmost data: 59.95°N, 0.05°E
-            double firstDataLat = 59.95;
-            double firstDataLon = -0.05;
-
-            // South Sumatera area 2.5°S - 5°S and 102°E - 106°E
-            double croptopLatDeg = -2.5;
-            double cropbottomLatDeg = -5;
-            double croprightLongDeg = -106;
-            double cropleftLongDeg = -102;
-
+            
             Console.WriteLine("4-byte Float Binary Data Converter");
             Console.WriteLine("===================================");
             Console.WriteLine("Program akan mengkonversi file {0} menjadi dua file: {1} dan {2}", inputFilePath, outputCsvPath, outputCropCsvPath);
@@ -84,6 +87,23 @@ namespace FloatDataConverter
                 Console.WriteLine("Error: {0}", ex.Message);
                 Console.ReadKey();
             }
+        }
+
+        public static void ConvertFile(FileInfo file)
+        {
+            // Map input data and export to CSV
+            var map = new Map(numDataRow, numDataColumn, gridSize, firstDataLat, firstDataLon.InterpolateLon());
+            map.ImportData(file.FullName);
+
+            var currentFilePath = file.FullName;
+            var outputFilePath = currentFilePath.Remove(currentFilePath.Length - file.Extension.Length) + "_ori.csv";
+            map.SaveToFile(outputFilePath, map.PrintDataCsvFormat());
+
+            // Crop Map and export to CSV
+            outputFilePath = currentFilePath.Remove(currentFilePath.Length - file.Extension.Length) + "_crop.csv";
+            var newMap = map.CropMap(croptopLatDeg, cropbottomLatDeg, cropleftLongDeg.InterpolateLon(), croprightLongDeg.InterpolateLon());
+            map.SaveToFile(outputFilePath, newMap.PrintDataCsvFormat());
+            Console.WriteLine("Converted: {0}...", file);
         }
 
         public static string ToLatString(this double lat)
