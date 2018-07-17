@@ -19,9 +19,9 @@ namespace FloatDataConverter
 
         // Initial upper and leftmost data: 59.95°N, 0.05°E
         private static double firstDataLat = 59.95;
-        private static double firstDataLon = -0.05;
+        private static double firstDataLon = 0.05;
 
-        // South Sumatera area 2.5°S - 5°S and 102°E - 106°E
+        // South Sumatera area 1.5°S - 5°S and 102°E - 106°E
         private static double croptopLatDeg = -1.5;
         private static double cropbottomLatDeg = -5;
         private static double croprightLongDeg = 106;

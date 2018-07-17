@@ -139,14 +139,13 @@ namespace FloatDataConverter
             var sb = new StringBuilder();
             sb.AppendLine(string.Format("{0}, {1}, {2}", "Data Value", "Latitude", "Longitude"));
             var currentLat = this.firstTopDataLat;
-            var currentLon = this.firstLeftDataLon.DeInterpolateLon();
             for (int i = 0; i < numRow; i++)
             {
-                currentLon = this.firstLeftDataLon.DeInterpolateLon();
+                var currentLon = this.firstLeftDataLon;
                 for (int j = 0; j < numColumn; j++)
                 {
-                    sb.AppendFormat("{0,15}, {1}, {2} \n", data[i, j].ToString(), currentLat, currentLon);
-                    currentLon -= this.gridSize;
+                    sb.AppendFormat("{0,15}, {1}, {2} \n", data[i, j].ToString(), currentLat, currentLon.DeInterpolateLon());
+                    currentLon += this.gridSize;
                 }
                 currentLat -= this.gridSize;
             }
