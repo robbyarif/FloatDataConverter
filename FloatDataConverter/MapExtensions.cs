@@ -13,19 +13,19 @@ namespace FloatDataConverter
         private static string inputFilePath = @"input.dat";
         private static string outputCsvPath = @"output.csv";
         private static string outputCropCsvPath = @"output_cropped.csv";
-        private static int numDataRow = 480;
-        private static int numDataColumn = 1440;
-        private static double gridSize = 0.25;
+        private static int numDataRow = 1200;
+        private static int numDataColumn = 3600;
+        private static double gridSize = 0.1;
 
         // Initial upper and leftmost data: 59.95°N, 0.05°E
         private static double firstDataLat = 59.95;
         private static double firstDataLon = -0.05;
 
         // South Sumatera area 2.5°S - 5°S and 102°E - 106°E
-        private static double croptopLatDeg = -2.5;
+        private static double croptopLatDeg = -1.5;
         private static double cropbottomLatDeg = -5;
-        private static double croprightLongDeg = -106;
-        private static double cropleftLongDeg = -102;
+        private static double croprightLongDeg = 106;
+        private static double cropleftLongDeg = 102;
 
 
         public static void ConvertData()
@@ -55,7 +55,7 @@ namespace FloatDataConverter
                 Console.Write("Grid Size: "); gridSize = Convert.ToDouble(Console.ReadLine());
                 Console.WriteLine("Gunakan aturan di bawah untuk pengisian Latitude dan Longitude");
                 Console.WriteLine("Lat: > 0 untuk North/Utara, < 0 untuk South/Selatan");
-                Console.WriteLine("Lon: < 0 untuk East/Bujur Timur, > 0 untuk West/Bujur Barat");
+                Console.WriteLine("Lon: > 0 untuk East/Bujur Timur, < 0 untuk West/Bujur Barat");
                 Console.Write("Data pertama terletak pada Lat: "); firstDataLat = Convert.ToDouble(Console.ReadLine());
                 Console.Write("Data pertama terletak pada Lon: "); firstDataLon = Convert.ToDouble(Console.ReadLine());
                 Console.Write("Top Crop Lat: "); croptopLatDeg = Convert.ToDouble(Console.ReadLine());
@@ -109,19 +109,19 @@ namespace FloatDataConverter
         }
         public static string ToLonString(this double lon)
         {
-            return lon >= 0 ? string.Format("{0}°W", lon) : string.Format("{0}°E", Math.Abs(lon));
+            return lon < 0 ? string.Format("{0}°W", lon) : string.Format("{0}°E", Math.Abs(lon));
         }
 
         /// <summary>
         /// Interpolate Longitude untuk map dengan Data menggunakan 0 BT 180 BT 180BB 0 BB 
-        /// sedangkan program menggunakan 180BB 0 180BT
-        /// contoh: 102 (BT) direpresentasikan dlm -102 diinterpolasi menjadi -78
-        /// contoh: 3 BB direpresentasikan dlm 3 diinterpolasi menjadi 177
+        /// sedangkan program menggunakan koordinat kartesian 180 0 180
+        /// contoh: 102 BT direpresentasikan dlm 102 diinterpolasi menjadi -78
+        /// contoh: 3 BB direpresentasikan dlm -3 diinterpolasi menjadi 177
         /// </summary>
         /// <returns>Longitude interpolated based on program requires</returns>
         public static double InterpolateLon(this double lonDeg)
         {
-            return lonDeg < 0 ? -1 * (180 + lonDeg) : 180 - lonDeg;
+            return lonDeg < 0 ? 180 + lonDeg : -1 * (180 - lonDeg);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace FloatDataConverter
         /// <returns></returns>
         public static double DeInterpolateLon(this double lon)
         {
-            return lon < 0 ? -1 * (180 + lon) : 180 - lon;
+            return lon < 0 ? 180 + lon : -1 * (180 - lon);
         }
     }
 }
