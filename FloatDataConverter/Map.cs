@@ -137,7 +137,7 @@ namespace FloatDataConverter
         public string PrintDataCsvFormat()
         {
             var sb = new StringBuilder();
-            sb.AppendLine(string.Format("{0}, {1}, {2}", "Data Value", "Latitude", "Longitude"));
+            sb.AppendLine(string.Format("{0}, {1}, {2}", "Value", "Latitude", "Longitude"));
             var currentLat = this.firstTopDataLat;
             for (int i = 0; i < numRow; i++)
             {

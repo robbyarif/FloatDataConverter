@@ -23,9 +23,9 @@ namespace FloatDataConverter
 
         // South Sumatera area 1.5°S - 5°S and 102°E - 106°E
         private static double croptopLatDeg = -1.5;
-        private static double cropbottomLatDeg = -5;
-        private static double croprightLongDeg = 106;
-        private static double cropleftLongDeg = 102;
+        private static double cropbottomLatDeg = -5.2;
+        private static double croprightLongDeg = 106.25;
+        private static double cropleftLongDeg = 101.95;
 
 
         public static void ConvertData()
